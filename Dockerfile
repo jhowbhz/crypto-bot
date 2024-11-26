@@ -1,11 +1,19 @@
-FROM node:10
+FROM ubuntu:22.04
 
-MAINTAINER Daniel Espendiller <daniel@espendiller.net>
+LABEL maintainer="Daniel Espendiller <daniel@espendiller.net>"
 
-# Install build-essential, sqlite in order
+# Update and install dependencies
 RUN apt-get update && apt-get install -y \
-    sqlite \
-&& rm -rf /var/lib/apt/lists/*
+    build-essential \
+    sqlite3 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g npm@latest && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 
@@ -20,5 +28,5 @@ COPY . /usr/src/app
 # Apply all patches in app
 RUN npm run postinstall
 
-EXPOSE 8080
+EXPOSE 8081
 CMD ["npm", "run", "start"]
